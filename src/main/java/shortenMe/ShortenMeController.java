@@ -9,40 +9,23 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
 
 import com.google.common.hash.Hashing;
 
-
-@Controller
+@RestController
 public class ShortenMeController {
 	@Autowired
 	private URLDatabaseInterface urlDatabase;
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String showHomePage(ShortenURLRequest request) {
-		return "shortener";
-
-	}
-
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public void remapToURL(@PathVariable String id, HttpServletResponse resp) throws Exception {
-		final String url = urlDatabase.findURLById(id);
-		if (url != null) {
-			resp.addHeader("Location", url);
-			resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-		} else {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
-
-	}
-
+	
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ModelAndView shortenUrl(HttpServletRequest httpRequest, @Valid ShortenURLRequest request,
 			BindingResult bindingResult) {
@@ -64,6 +47,25 @@ public class ShortenMeController {
 		}
 		return modelAndView;
 	}
+	@RequestMapping(value="/", method = RequestMethod.GET)
+	public String showHomePage(ShortenURLRequest request) {
+		return "shortener";
+
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public void remapToURL(@PathVariable String id, HttpServletResponse resp) throws Exception {
+		final String url = urlDatabase.findURLById(id);
+		if (url != null) {
+			resp.addHeader("Location", url);
+			resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+		} else {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
+
+	}
+
+
 
 	private boolean isUrlValid(String url) {
 		boolean valid = true;
